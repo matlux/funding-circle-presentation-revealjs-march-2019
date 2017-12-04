@@ -40,24 +40,40 @@
 					<a href="https://brokercompare-clojurex2017.herokuapp.com/">https://brokercompare-clojurex2017.herokuapp.com/</a>
 
           <aside class="notes">
-            Hi my name is Mathieu Gauthron, I have been involved with BrokerCompare, an inovative
-						price comparison start-up for now over a year.
+            Hi my name is Mathieu Gauthron, I'm the CTO and a shareholder of BrokerCompare, an inovative
+						price comparison start-up who i have been involved with for now over a year. You might remember the Klipse talk from last year. Following that
+						We have successfully introduced Clojure and Yehonathan to the CEO of this company Stuart Millson setting here.
 						Today I want to share with you some of the design choices, the reasons and the benefits choosing Clojure brought to Broker Compare.
           	(time 0 mins; total 0 mins)
           </aside>
         </section>
+
+				<section>
+					<h3>Broker Pricing Structure</h3>
+					<img  src="img/broker_pricing.png" alt="broker pricing">
+
+					<aside class="notes">
+						Let me give you some background:
+						BrokerCompare provides a price comparison widget for ISA and SIPP stock and share brokering platforms.
+						Those platform have a wide variaty of pricing strucutre (as you can see on this table). Many type of cost, some applied by some
+						brokers but not by all.
+						In every other industry users can go to comp web site and see what they. We created the same functionality for this industry.
+						(time 0 mins; total 0 mins)
+					</aside>
+				</section>
 				<section>
 					<img  src="img/brokercompare_se.png" alt="brokercompare_se">
 					<img class="fragment" height="500" width="800" src="img/brokercompare_results.png" alt="brokercompare_results">
 
 					<aside class="notes">
-						Let me give you some background:
-						BrokerCompare provides a price comparison widget for ISA and SIPP stock and share brokering platforms.
+
+						This is what the BC UI looks like.
 						Typically a user interested in managing their savings will read an article from one of the main content providers like,
-						ThisIsMoney, MoneyForTheMasses, Uswitch
-						The user answers a series of questions about their investment profile. [next] Then the comparison engines returns a list of
-						suitable providers sorted by cost
+						ThisIsMoney, InvestorCronicle, Uswitch
+						The user answers a series of questions about their investment profile. Then the comparison engines returns a list of
+					  providers sorted by cost
 						, provides a breakdown of costs and additional qualitative information before the user decides whether to open an account or not.
+						For the story 950/year.
 						(time 0 mins; total 0 mins)
 					</aside>
 				</section>
@@ -68,7 +84,7 @@
           <img  src="img/1000_questions_startup_need_to_answer.jpg" alt="how_to_start_a_startup">
 				 <aside class="notes">
             A start-up like BrokerCompare needs to make many important choices to become successful. Choosing the development language which will be used to implement
-						the main service of the business can be tricky. Especially for a founders who don't
+						the main service of the business can be tricky. Especially for  founders who don't
             Necesserally have the IT knowledge to appreciate the subtle difference and advantage of one technological stack over another.
 
 						Let's face it, business owners are not interested in language beauty. Whether the language is homoiconic, imutable, functional, etc...
@@ -77,6 +93,9 @@
 
 						There are a various mainstream technologies out there which are widely used, proven, cheap to resource for and quick to develop with.
 					  As business owner why would you not stick with them?
+
+						However it worth mentioning at this point the Clojure is not just LISP language, it's about pragmatism. And we will see in our case how clojure
+						enabled high level communication/interface between business owner and developers.
 
 						When I joined BrokerCompare, I found a backend and front end developed in PHP, React and a bog standard MySQL database.
 
@@ -110,7 +129,7 @@
 					<h4>Sprawling Complexity</h4>
 
 						<ol>
-							<li class="fragment">source code > 150K LOC</li>
+							<li class="fragment">source code > 20k x 2  LOC</li>
 							<li class="fragment">business layer mixed with presentation code</li>
 							<li class="fragment">20K LOC main business function</li>
 							<li class="fragment">no breakdown of business functionality into re-usable modules</li>
@@ -119,14 +138,7 @@
 						</ol>
 
 					<aside class="notes">
-						150K loc
-						business layer mixed with presentation code
-						20K LOC main business function
-						no breakdown of business functionality into re-usable modules
-						business service code highly duplicated
-						no unit testing of the services
-
-
+						[talk avor points]
 						One thing I forgot to say, start-ups also need something else crucial to their success:
 						They need agility because they don't know in advance how they will need to adapt their features to leverage a newly discovered market.
 						Having built a pilot quickly can prove to be challenging in face of the need for rapid changes.
@@ -146,7 +158,7 @@
 			  <section data-markdown>
 					## Technology Stack  at BrokerCompare
 
-					* PHP + React front end
+					* React front end
 					* Clojure REST service - based on Catacumba
 					* MongoDB - business rule definitions
 					* MySQL - storage of the transactions
@@ -154,7 +166,7 @@
 
 
 					Here is what we built after the introduction of Clojure.
-					For practical reasons the front end was kept in PHP and React, a REST service backend was written in Clojure,
+					For practical reasons we kept React, a REST service backend was rewritten in Clojure,
 					a MongoDB for business rule definitions and MySQL database for storage of the transactions.
 
 
@@ -184,7 +196,7 @@
 						to get a feeling for some of the benefits we got out them.
 						I could go on for hours. I'm only in some examples where the choice of Clojure
 						provided compeling benefits to the company.
-						In particular the use of Spec and Midje were central it.
+						In particular the use of Clojure Spec and Midje were central it.
 
 					(time 1 : total time 5 mins)
 					</aside>
@@ -273,18 +285,19 @@ with a :segment. the segment is composed of for values :low :high :value and an 
 				<section data-markdown>
 Spec provides validation out of the box
 ```clojure
-(s/valid? ::form-data form-data)
+(s/valid? ::fees broker-fees)
 ```
 note:
 Not only do you get the grammar so you can validate your data throughout your program [next page].
 
-here s/valid? is the spec function that validate the form data input coming through the rest interface
+It also provides a business interface for the business owner to validate their changes in fee structure.
+here s/valid? is the spec function that validate the broker fee.
 
 But it also provides very high level semantic for testing properties [next page].
 
 				</section>
 				<section data-markdown>
-Spec provides validation out of the box
+Spec and test.check expresse business invariants
 ```clojure
 (defspec test-form-data->portfolio-investments-split-properly-trading
 	(for-all [portfolio-form-data (s/gen ::portfolio/form-data)]
@@ -355,7 +368,7 @@ Here we are testing the function first-year-cost-scala with parameterized by thi
 
 					 That's how Yehonathan managed to
 					 * develop a backend prototype in around 2 weeks
-					 * reduce 150K LOC down to 2K LOC
+					 * reduce 20K LOC down to 2K LOC
 					 * provided a business domain DSL with spec
 					 * self-testing framework with spec generators
 
@@ -366,7 +379,7 @@ Here we are testing the function first-year-cost-scala with parameterized by thi
 					<h3>Clojure is your friend</h3>
 					<img  src="img/clojure_is_your_friend.jpg" alt="clojure_is_your_friend">
 				 <aside class="notes">
-					 For all those reasons...
+					 For all those reasons... As Paul Graham mentioned about LISP b4.
 					 Clojure is your secret weapon which will provide you with maximum flexibility, robustness and fast time to market
 
 					 I live you with this final thought:
@@ -385,6 +398,7 @@ Here we are testing the function first-year-cost-scala with parameterized by thi
 						(time 0 mins; total 0 mins)
 					</aside>
 				</section>
+				<!--
 				<section>
 					<h3>As a developer, what is so good about Clojure?</h3>
           <img height="500" width="500"  src="img/avatar.jpg" alt="developer">
@@ -513,13 +527,13 @@ Here we are testing the function first-year-cost-scala with parameterized by thi
           	(time 0 mins; total 0 mins)
           </aside>
         </section>
-				<!--<section>
+				<section>
 					<h2>Why do we use Clojure?</h2>
 					<aside class="notes">
 						blabla
 						(time 0 mins; total 0 mins)
 					</aside>
-				</section> -->
+				</section>
 				<section data-markdown>
 As a developer, what is so good about Clojure?
 ![](img/avatar.jpg)
@@ -530,7 +544,7 @@ Why are we all at this Conference?
 
 Why do we love Clojure?
 				</section>
-				<section>Slide 2</section>
+				<section>Slide 2</section>-->
 			</div>
 		</div>
 
