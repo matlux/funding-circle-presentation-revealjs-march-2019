@@ -7,10 +7,14 @@
 		<title>reveal.js</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/league.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<style>
+		.reveal section img { background:none; border:none; box-shadow:none; }
+		</style>
 
 		<!-- Printing and PDF exports -->
 		<script>
@@ -24,7 +28,508 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
+				<section>
+					<h3>Clojure at a start-up</h3>
+          <img   border="none" background-color="white" src="img/broker-compare.png" alt="Broker Compare"><h3>
+          Case Study
+					</h3>
+					</p>
+					Author:
+					Mathieu Gauthron
+					</p>
+					<a href="http://slides-euroclojure2014.matlux.net">http://slides-euroclojure2014.matlux.net</a>
+
+          <aside class="notes">
+            Hi my name is Mathieu Gauthron, I have been involved with BrokerCompare, an inovative
+						price comparison start-up for now over a year.
+						Today I want to share with you some of the design choices, the reasons and the benefits choosing Clojure brought to Broker Compare.
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<img  src="img/brokercompare_se.png" alt="brokercompare_se">
+					<img class="fragment" height="500" width="800" src="img/brokercompare_results.png" alt="brokercompare_results">
+
+					<aside class="notes">
+						Let me give you some background:
+						BrokerCompare provides a price comparison widget for ISA and SIPP stock and share brokering platforms.
+						Typically a user interested in managing their savings will read an article from one of the main content providers like,
+						ThisIsMoney, MoneyForTheMasses, Uswitch
+						The user answers a series of questions about their investment profile. [next] Then the comparison engines returns a list of
+						suitable providers sorted by cost
+						, provides a breakdown of costs and additional qualitative information before the user decides whether to open an account or not.
+						(time 0 mins; total 0 mins)
+					</aside>
+				</section>
+
+
+				<section>
+					<h3>Start-ups - cost &  time to market</h3>
+          <img  src="img/1000_questions_startup_need_to_answer.jpg" alt="how_to_start_a_startup">
+				 <aside class="notes">
+            A start-up like BrokerCompare needs to make many important choices to become successful. Choosing the development language which will be used to implement
+						the main service of the business can be tricky. Especially for a founders who don't
+            Necesserally have the IT knowledge to appreciate the subtle difference and advantage of one technological stack over another.
+
+						Let's face it, business owners are not interested in language beauty. Whether the language is homoiconic, imutable, functional, etc...
+
+						Start-ups want to run on minimal cost and be quick to reach a market.
+
+						There are a various mainstream technologies out there which are widely used, proven, cheap to resource for and quick to develop with.
+					  As business owner why would you not stick with them?
+
+						When I joined BrokerCompare, I found a backend and front end developed in PHP, React and a bog standard MySQL database.
+
+
+						(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<img   src="img/that_moment_when_you_realise_you_have_php.jpg" alt="that_moment_when_you_realise_you_have_php">
+				 <aside class="notes">
+					 I know what your going to say, but actually
+					 it made total sense at the time. The product was functional.
+					 It was developed in no time and the resources based in Ukraine were resonably priced, keeping the burning cost low.
+					 Everyone knows PHP, hiring more PHP developer would never be an issue.
+
+					 In a nutshell PHP was a success...
+
+					 Except for one thing: Sprawling Complexity
+
+
+
+						(time 0 mins; total 0 mins)
+					</aside>
+				</section>
+				<section>
+
+
+						<img height="200" width="300"  src="img/datacomplex.jpg" alt="datacomplex">
+
+
+					<h4>Sprawling Complexity</h4>
+
+						<ol>
+							<li class="fragment">source code > 150K LOC</li>
+							<li class="fragment">business layer mixed with presentation code</li>
+							<li class="fragment">20K LOC main business function</li>
+							<li class="fragment">no breakdown of business functionality into re-usable modules</li>
+							<li class="fragment">business service code highly duplicated</li>
+							<li class="fragment">no unit testing of the services</li>
+						</ol>
+
+					<aside class="notes">
+						150K loc
+						business layer mixed with presentation code
+						20K LOC main business function
+						no breakdown of business functionality into re-usable modules
+						business service code highly duplicated
+						no unit testing of the services
+
+
+						One thing I forgot to say, start-ups also need something else crucial to their success:
+						They need agility because they don't know in advance how they will need to adapt their features to leverage a newly discovered market.
+						Having built a pilot quickly can prove to be challenging in face of the need for rapid changes.
+
+						Suddenly the technical debt was catching up with BrokerCompare.
+						Managing the duplicated code needed to manage multiple content providers was making new feature development
+						slow, inconsistent and error prone. After an initial code review, we decided that extracting
+						the business logic out from PHP and rewriting into a Clojure backend was the best way to solve the development
+						challengies the company faced.
+
+
+
+					(time 1 : total time 5 mins)
+					</aside>
+				</section>
+
+			  <section data-markdown>
+					## Technology Stack  at BrokerCompare
+
+					* PHP + React front end
+					* Clojure REST service - based on Catacumba
+					* MongoDB - business rule definitions
+					* MySQL - storage of the transactions
+					note:
+
+
+					Here is what we built after the introduction of Clojure.
+					For practical reasons the front end was kept in PHP and React, a REST service backend was written in Clojure,
+					a MongoDB for business rule definitions and MySQL database for storage of the transactions.
+
+
+
+					(time 0 : total time 0 mins)
+				</section>
+				<section>
+
+
+
+					<h3>Technology Stack at BrokerCompare</h3>
+
+						<ol>
+							<li >Business domain DSL with Spec</li>
+							<li >org.clojure/test.check Free testing with spec generators and properties</li>
+							<li >midje - tabular facts</li>
+							<li >funcool/catacumba</li>
+							<li >com.novemberain/monger - (Mongo DB)</li>
+							<li >MySQL</li>
+							<li >funcool/catacumba-prone</li>
+							<li >hikari-cp - for fast JDBC connection pool</li>
+						</ol>
+
+					<aside class="notes">
+						Here is list of the technologies and libraries used on the Clojure project. [PAUSE]
+						Let me go through a couple of them
+						to get a feeling for some of the benefits we got out them.
+						I could go on for hours. I'm only in some examples where the choice of Clojure
+						provided compeling benefits to the company.
+						In particular the use of Spec and Midje were central it.
+
+					(time 1 : total time 5 mins)
+					</aside>
+				</section>
+				<section data-markdown>
+Business domain DSL definition with Spec
+```clojure
+(def Fidelity-fees
+  { :name            "Fidelity",
+	  :account         {:holding  {:funds  {:rates [[0 7499.99 0.0035 "cancel-if-no-regular-dealing"] [7500 249999.99 0.0035] [250000 Infinity 0.002]],
+	                                        :max   2000.0,
+	                                        :type  "percentage-all"}
+	                               :shares {:rates [[0 7499.99 0.0] [7500 Infinity 0.0035]]
+	                                        :type  "percentage-all"
+	                                        :max   45}},
+	                    :periodic {:shares {:rates [[0 7500 45.0] [7500 Infinity 0.0]], :type "fixed"},
+	                               :funds  {:rates [[0 7500 45.0] [7500 Infinity 0.0]], :type "fixed" :cancel-if-regular-dealing true}}},
+	  :dealing         {:shares {:type               "percentage",
+	                             :percent-commission true,
+	                             :rates              0.001}},
+	  :regular-dealing {:shares {:type               "percentage",
+	                             :percent-commission true,
+	                             :rates              0.001}
+	                    }})
+```
+note:
+
+I'm going to show you a few code excerpts to give you a feel for how some of the feature were useful to us
+.
+Here, you can see an example of DSL that was created using Spec to define the semantic of
+a stock and share broker platform.
+One of them is Fidelity. just draw your attention to how the fee structure of the :funds and :shares are
+expressed using a rich semantic.
+				</section>
+
+				<section data-markdown>
+					```clojure
+(def Fidelity-fees
+ {:name  "Fidelity",
+	:account {:holding {:funds {:rates [[0 7499.99 0.0035 "cancel-if-no-regular-dealing"]
+		                                [7500 249999.99 0.0035] [250000 Infinity 0.002]],
+                              :max   2000.0,
+                              :type  "percentage-all"}
+                      :shares {:rates [[0 7499.99 0.0] [7500 Infinity 0.0035]]
+                              :type  "percentage-all"
+                              :max   45}},
+...})
+					```
+```clojure
+(s/def ::segment (s/and (s/cat :low ::positive-number
+                               :high ::positive-number
+                               :value ::rate
+                               :option (s/? ::segment-option))
+                        #(<= (-> % :low) (-> % :high))))
+(s/def ::chart (s/coll-of ::segment :min-count 1))
+(s/def ::rates (s/or :n (s/and ::rate #(> % 0)) :chart ::chart))
+...
+(s/def ::basic-fees (s/and (s/keys :req-un [::tiered/rates ::tiered/type]
+                                   :opt-un [::max ::min ::period-in-months
+                                            ::min-trades-to-cancel ::cancel-if-funds
+                                            ::funds-ratio ::percent-commission ::loyalty-discount
+                                            ::free-trades
+                                            ::cancel-if-regular-dealing])
+                           (s/or :no-min #(-> % :min nil?)
+                                 :no-max #(-> % :max nil?)
+                                 :min-max #(<= (-> % :min) (-> % :max)))
+                           seq))
+(s/def ::shares ::basic-fees)
+(s/def ::funds ::basic-fees)
+(s/def ::shares-and-funds-fees (s/and (s/keys :opt-un [::shares-and-funds ::funds-and-shares ::shares ::funds])
+                                      shares-and-funds-valid-combination?))
+...
+(s/def ::type #{"percentage" "fixed" "percentage-all"})
+(s/def ::holding ::common/shares-and-funds-fees)
+(s/def ::opening-and-periodic-exclusive #(< (count (select-keys % [:opening :periodic])) 2))
+(s/def ::single-account (s/and (s/keys :opt-un [::holding ::opening ::periodic])
+                               ::opening-and-periodic-exclusive))
+(s/def ::account ::single-account)
+```
+note:
+The grammar of this semantic is defined with a tree of Specs. You can see on this example,
+how an :account is composed of :holding -> :shares -> :rates :max :type. See how the :rate is defined
+with a :segment. the segment is composed of for values :low :high :value and an :option.
+
+				</section>
+				<section data-markdown>
+Spec provides validation out of the box
+```clojure
+(s/valid? ::form-data form-data)
+```
+note:
+Not only do you get the grammar so you can validate your data throughout your program [next page].
+
+here s/valid? is the spec function that validate the form data input coming through the rest interface
+
+But it also provides very high level semantic for testing properties [next page].
+
+				</section>
+				<section data-markdown>
+Spec provides validation out of the box
+```clojure
+(defspec test-form-data->portfolio-investments-split-properly-trading
+	(for-all [portfolio-form-data (s/gen ::portfolio/form-data)]
+		(let [portfolio (form-data->portfolio portfolio-form-data)]
+			(investments-split-properly-trading? portfolio-form-data portfolio))))
+```
+note:
+Here we can the specification of  invariant propertes which exist between the
+submitted form-data and the portfolio object.
+
+Spec also provides explanations [next page].
+
+				</section>
+
+
+				<section data-markdown>
+Spec provides explanation out of the box
+```clojure
+(facts "form data -> portfolio is valid"
+   (tabular (fact "basic"
+     (s/explain-str ::portfolio/portfolio (second (form-data->portfolio ?form-data))) => success)
+            ?form-data
+						myform
+						...))
+
+```
+note:
+Here the s/explain-str function explains to the developer what was wrong in the form-data in case the test fails
+				</section>
+
+				<section data-markdown>
+Midje - tabular facts
+```clojure
+(facts "First-Year Cost - Scalar"
+  (tabular (fact "ISA only with no account charge - Hargreaves Lansdown"
+    (first-year-cost-scalar
+		  {:duration ?duration
+			 :deals {:funds {:trades ?funds-trades} :shares {:trades ?shares-trades}}
+       :isa {:investing-shares {:amount ?shares-amount}
+       :investing-funds {:amount ?funds-amount}}}
+           Hargreaves-Lansdown-fees) => (roughly ?cost))
+    ?funds-amount ?funds-trades ?shares-amount ?shares-trades ?duration ?cost
+    50000         2             0              0              10        225
+    300000        6             0              0              10        1250
+    0             0             8000           4              10        83.8
+    50000         4             25000          6              10        342))
+```
+note:
+Midje provides a nice tabular source of facts that can be tested.
+Here we are testing the function first-year-cost-scala with parameterized by this table.
+				</section>
+				<section>
+          <img height="180" width="400"   src="img/1770207_clojure-meetup_s1800x0_q80_noupscale.jpg" alt="clojure">
+					Benefits to BrokerCompare
+					<ol>
+						<li class="fragment">developed a backend prototype in around 2 weeks</li>
+						<li class="fragment">reduce 150K LOC down to 2K LOC</li>
+						<li class="fragment">provided a business domain DSL with spec</li>
+						<li class="fragment">self-testing framework with spec generators</li>
+					</ol>
+				 <aside class="notes">
+					 Let's recap:
+					 Although a typical experienced Clojure developer's hourly rate tends to be higher than a PHP's,
+					 choosing Clojure provided key benefits which offset that fact. Clojure holds
+					 strong principles with regards to simplicity. It's not just the language itself, it's the ethos that created by it accross the community which
+					 creates a virtue cycle. The language is simple, minimalistic, in search high expressivity and elegance. This attracts
+					 likeminded developers who care. Who cares about minimal design, code re-use and business domain expressivity.
+
+					 That's how Yehonathan managed to
+					 * develop a backend prototype in around 2 weeks
+					 * reduce 150K LOC down to 2K LOC
+					 * provided a business domain DSL with spec
+					 * self-testing framework with spec generators
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<h3>Clojure is your friend</h3>
+					<img  src="img/clojure_is_your_friend.jpg" alt="clojure_is_your_friend">
+				 <aside class="notes">
+					 For all those reasons...
+					 Clojure is your secret weapon which will provide you with maximum flexibility, robustness and fast time to market
+
+					 I live you with this final thought:
+
+						(time 0 mins; total 0 mins)
+					</aside>
+				</section>
+				<section>
+					<img height="500" width="500"  src="img/every_time_you_copy_code_god_kills_a_kitten.jpg" alt="every_time_you_copy_code_god_kills_a_kitten">
+				 <aside class="notes">
+
+
+					 ...
+					 Clojure enables simplicity, expressivity and elegance. It attracts developers who cares. That's above all what made this project a success.
+
+						(time 0 mins; total 0 mins)
+					</aside>
+				</section>
+				<section>
+					<h3>As a developer, what is so good about Clojure?</h3>
+          <img height="500" width="500"  src="img/avatar.jpg" alt="developer">
+				 <aside class="notes">
+					 Why do we use Clojure?
+
+					 Why are we all at this Conference?
+
+					 Why do we love Clojure?
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<h3>The language of god?</h3>
+          <img src="img/lisp_universe.jpeg" alt="lisp_universe">
+				 <aside class="notes">
+					 	Is it the beauty of the language?
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<h3>Simple made easy</h3>
+          <img  src="img/clojure_three_circles.jpg" alt="clojure_three_circles">
+				 <aside class="notes">
+					 Is it the language is build on strong principles with simplicity in mind?
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<h3>Broker Compare started with PHP</h3>
+          <img  src="img/chateau_cartes_enl.jpg" alt="chateau_cartes_enl">
+				 <aside class="notes">
+					  Truth is Broker Compare started with its first pilot fully written in PHP.
+						It did serve its purpose at the time.
+						The technology provided a fast time to market whist initially keeping the cost down.
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+          <img height="500" width="500"  src="img/every_time_you_copy_code_god_kills_a_kitten.jpg" alt="every_time_you_copy_code_god_kills_a_kitten">
+				 <aside class="notes">
+					 	The issue wasn't so much the front end.
+						The backend quickly accumulated bad patterns:
+						copy & paste - the code quickly reached 150K LOC
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<h3>Less is more</h3>
+          <img  src="img/less-is-more-a-to-b.jpg" alt="less-is-more a-to-b">
+				 <aside class="notes">
+					 no automatic test of the business functionality meant a lot of flexibility was lost to adapt to knew markets.
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					<h3>Less is more</h3>
+          <img  src="img/less-is-more2.png" alt="less-is-more">
+				 <aside class="notes">
+					 Although Clojure developer hourly rate tends to be higher than PHP's
+					 The fact that Yehanathan managed to
+					 * develop a backend prototype in around 2 weeks
+					 * reduce 150K LOC down to 2K LOC
+					 * provided a business domain DSL with spec
+					 * self-testing framework with spec generators
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<section>
+					What is BrokerCompare?
+					Description - Price comparison invative startup
+					design - Clojure backend -- PHP/React frontend
+					[DIAGRAM INSERT HERE]
+				 <aside class="notes">
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+
+
+				<section>
+
+
+
+					<h3>Technology stack</h3>
+
+						<ol>
+							<li class="fragment">Business domain DSL with Spec</li>
+							<li class="fragment">Free testing with generators</li>
+							<li class="fragment">funcool/catacumba</li>
+							<li class="fragment">mongo DB with  - com.novemberain/monger</li>
+							<li class="fragment">MySQL</li>
+							<li class="fragment">funcool/catacumba-prone</li>
+							<li class="fragment">hikari-cp</li>
+							<li class="fragment">org.clojure/test.check</li>
+							<li class="fragment">midje - tabular facts</li>
+						</ol>
+
+					<aside class="notes">
+						Business domain DSL with Spec
+						Free testing with generators
+						funcool/catacumba - Catacumba is an asynchronous or non-blocking web toolkit for Clojure built on top of ratpack and netty drawing inspiration from ring, pedestal and ratpack.
+						mongo DB with  - com.novemberain/monger
+						MySQL
+						funcool/catacumba-prone
+						funcool/clojure.jdbc
+						hikari-cp
+						org.clojure/test.check
+						midje - tabular facts (see broker example)
+					(time 1 : total time 5 mins)
+					</aside>
+
+				</section>
+
+				<section>
+					<h3>Clojure is your friend</h3>
+          <img  src="img/clojure_is_your_friend.jpg" alt="clojure_is_your_friend">
+				 <aside class="notes">
+					 For all those reasons...
+					 Clojure is your secret weapon which will provide you with maximum flexibility, robustness and fast time to market
+
+          	(time 0 mins; total 0 mins)
+          </aside>
+        </section>
+				<!--<section>
+					<h2>Why do we use Clojure?</h2>
+					<aside class="notes">
+						blabla
+						(time 0 mins; total 0 mins)
+					</aside>
+				</section> -->
+				<section data-markdown>
+As a developer, what is so good about Clojure?
+![](img/avatar.jpg)
+note:
+Why do we use Clojure?
+
+Why are we all at this Conference?
+
+Why do we love Clojure?
+				</section>
 				<section>Slide 2</section>
 			</div>
 		</div>
@@ -37,6 +542,7 @@
 			// - https://github.com/hakimel/reveal.js#configuration
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
+				transition: 'convex',
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
